@@ -1,10 +1,10 @@
 # Golem Network Local Node Docker Compose Files
 
-This repository contains Docker Compose configuration files for running Golem-Base nodes locally using Docker containers. These configurations allow you to run and operate your own Golem node in a containerized environment.
+This repository contains Docker Compose configuration files for running Golem Base nodes locally using Docker containers. These configurations allow you to run and operate your own Golem node in a containerized environment.
 
 ## Overview
 
-These docker-compose files enable you to run Golem-Base nodes locally in Docker containers. This setup is suitable for running actual nodes that can participate in the Golem-Base, process tasks, and interact with other nodes.
+These docker-compose files enable you to run Golem Base nodes locally in Docker containers. This setup is suitable for running actual nodes that can participate in the Golem Base, process tasks, and interact with other nodes.
 
 ## Prerequisites
 
