@@ -123,6 +123,7 @@ services:
       - --authrpc.jwtsecret=/jwt/jwt 
       - --usb=false 
       - --state.scheme=hash 
+      - --nat=none
       - --bootnodes=enode://73f2b67a07d6f1ccdcceebede4e9da2f310edc5234330df3d757d2b5fa4aa7bc2594d19ba6c5b2f031a35eb6ad26b64ab1f726f335306b4d3c556ce8def1a140@116.202.192.224:30403,enode://867a6d37a23b6941642d1523a52cf280615eb7593ebc60cb119867f4c1678cfe4a575bd57262dfcadb67986a364354567ef95db48b8641c9a51926313b21b6f0@116.202.192.224:30404,enode://ab7563a319a28cb96cbbfcbbe83329bf3f57c87aec3cd66a811f7fe226400f352cd8f0ca92586fee57d35842c5bb359b06d4d7da6a80168584f579a8f5a3ea14@116.202.192.224:30405
     ports:
       - 8545:8545
@@ -153,7 +154,7 @@ services:
       - --rpc.port=9545
       - --rpc.enable-admin
       - --p2p.nat=true
-      - --p2p.bootnodes=enr:-J64QORj4u9uGLVJYmb_dHCl47m7gySW1-4t_rE9VfrpL2RPIRBAKWcLaBxA9bhFn8H942bsF5zDhNeS2umNBye0U5GGAZZkK5JBgmlkgnY0gmlwhHTKwOCHb3BzdGFja4S6ghgAiXNlY3AyNTZrMaECzjCwkAy3SkUVzxdBcwYB_tOyqGbjF8V80TToRFcOO-WDdGNwgnbWg3VkcIJ21g
+      - --p2p.bootnodes=enr:-J64QHycZJLh_12-9DNO7Te1chzJoFpYYFl6G-eUJqG4oYfjdsEdoLWcQ3fuRRfxfpKMp-4jCSEsBorpXoMsQTE9ur-GAZZkK5JHgmlkgnY0gmlwhHTKwOCHb3BzdGFja4S6ghgAiXNlY3AyNTZrMaECzjCwkAy3SkUVzxdBcwYB_tOyqGbjF8V80TToRFcOO-WDdGNwgnbWg3VkcIJ21g,enr:-J64QORj4u9uGLVJYmb_dHCl47m7gySW1-4t_rE9VfrpL2RPIRBAKWcLaBxA9bhFn8H942bsF5zDhNeS2umNBye0U5GGAZZkK5JBgmlkgnY0gmlwhHTKwOCHb3BzdGFja4S6ghgAiXNlY3AyNTZrMaECzjCwkAy3SkUVzxdBcwYB_tOyqGbjF8V80TToRFcOO-WDdGNwgnbWg3VkcIJ21g,enr:-J64QKzgeWhBjQwt-dDOkrxOTN3-SJdgxSODEOdghO8kmKhVI2ExzUtxTPu4S7zeJimHyQgqtF-Nj0CKBMCV3R1z_iSGAZZkw6WMgmlkgnY0gmlwhHTKwOCHb3BzdGFja4S6ghgAiXNlY3AyNTZrMaECPlyiCkdQpgyhrJEhZkNr7dRDpSAkUVWOgCOkiQxSxjaDdGNwgnbYg3VkcIJ22A
       - --p2p.listen.tcp=9222
       - --p2p.listen.udp=9222
       - --metrics.enabled

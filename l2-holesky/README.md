@@ -50,3 +50,8 @@ You can monitor the sync status through the RPC endpoints:
 This node connects to Holesky L1 endpoints at:
 - Execution: https://execution.holesky.l1.gobas.me
 - Consensus: https://consensus.holesky.l1.gobas.me
+
+## Bridge
+
+To transfer funds from Holesky L1 to our L2, send funds to the bridge address `0x54d6c1435ac7b90a5d46d01ee2f22ed6ff270ed3`
+
