@@ -16,10 +16,10 @@ services:
       - -c
       - |
         set -e
-        
+
         # Create config directory
         mkdir -p /config
-        
+
         # Download genesis.json for op-geth if it doesn't exist
         echo 'Checking for genesis file'
         if [ ! -f '/config/genesis.json' ]; then
@@ -32,7 +32,7 @@ services:
         else
           echo 'Genesis file already exists, skipping download'
         fi
-        
+
         # Download rollup.json for op-node if it doesn't exist
         echo 'Checking for rollup config'
         mkdir -p /op-node/rollup
@@ -43,14 +43,14 @@ services:
             exit 1
           fi
           echo 'Rollup config downloaded successfully'
-          
+
           # Set proper permissions only if we downloaded new files
           chmod -R 777 /op-node
           chmod -R 777 /config
         else
           echo 'Rollup config already exists, skipping download'
         fi
-        
+
         # Generate JWT secret if it doesn't exist
         if [ ! -f '/jwt/jwt' ]; then
           echo 'Generating JWT secret'
@@ -81,7 +81,7 @@ services:
         set -e
         if [ ! -f '/geth/geth' ]; then
           echo 'Initializing geth data directory with genesis block...'
-          
+
           # Use genesis file from op-init
           if ! geth init --state.scheme=hash --datadir='/geth' '/config/genesis.json'; then
             echo 'ERROR: Failed to initialize geth with genesis block'
@@ -103,26 +103,26 @@ services:
       op-geth-init:
         condition: service_completed_successfully
     command:
-      - --networkid=393530 
-      - --datadir=/geth 
-      - --http 
-      - --http.corsdomain=* 
-      - --http.vhosts=* 
-      - --http.addr=0.0.0.0 
-      - --http.port=8545 
-      - --http.api=debug,eth,txpool,net,engine,web3 
-      - --ws 
-      - --ws.addr=0.0.0.0 
-      - --ws.port=8546 
-      - --ws.origins=* 
-      - --ws.api=debug,eth,txpool,net,engine,web3 
-      - --syncmode=snap 
-      - --authrpc.vhosts=* 
-      - --authrpc.addr=0.0.0.0 
-      - --authrpc.port=8551 
-      - --authrpc.jwtsecret=/jwt/jwt 
-      - --usb=false 
-      - --state.scheme=hash 
+      - --networkid=393530
+      - --datadir=/geth
+      - --http
+      - --http.corsdomain=*
+      - --http.vhosts=*
+      - --http.addr=0.0.0.0
+      - --http.port=8545
+      - --http.api=debug,eth,txpool,net,engine,web3
+      - --ws
+      - --ws.addr=0.0.0.0
+      - --ws.port=8546
+      - --ws.origins=*
+      - --ws.api=debug,eth,txpool,net,engine,web3
+      - --syncmode=snap
+      - --authrpc.vhosts=*
+      - --authrpc.addr=0.0.0.0
+      - --authrpc.port=8551
+      - --authrpc.jwtsecret=/jwt/jwt
+      - --usb=false
+      - --state.scheme=hash
       - --nat=none
       - --bootnodes=enode://73f2b67a07d6f1ccdcceebede4e9da2f310edc5234330df3d757d2b5fa4aa7bc2594d19ba6c5b2f031a35eb6ad26b64ab1f726f335306b4d3c556ce8def1a140@116.202.192.224:30403,enode://867a6d37a23b6941642d1523a52cf280615eb7593ebc60cb119867f4c1678cfe4a575bd57262dfcadb67986a364354567ef95db48b8641c9a51926313b21b6f0@116.202.192.224:30404,enode://ab7563a319a28cb96cbbfcbbe83329bf3f57c87aec3cd66a811f7fe226400f352cd8f0ca92586fee57d35842c5bb359b06d4d7da6a80168584f579a8f5a3ea14@116.202.192.224:30405
     ports:
