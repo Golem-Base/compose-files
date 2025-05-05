@@ -1,0 +1,186 @@
+
+volumes:
+  op_geth_data:
+  op_node_data:
+  jwt_shared:
+  config_data:
+
+services:
+
+  # ========================================
+  # OPTIMISM NODE SERVICES
+  # ========================================
+  op-init:
+    image: alpine:latest
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+
+        # Create config directory
+        mkdir -p /config
+
+        # Download genesis.json for op-geth if it doesn't exist
+        echo 'Checking for genesis file'
+        if [ ! -f '/config/genesis.json' ]; then
+          echo 'Downloading genesis file'
+          if ! wget -O '/config/genesis.json' 'https://fsn1.your-objectstorage.com/rollup-deployments/hibernia/genesis.json'; then
+            echo 'ERROR: Failed to download genesis file'
+            exit 1
+          fi
+          echo 'Genesis file downloaded successfully'
+        else
+          echo 'Genesis file already exists, skipping download'
+        fi
+
+        echo 'Checking for chain-id file'
+        if [ ! -f '/config/chain-id' ]; then
+          echo 'Downloading chain-id file'
+          if ! wget -O '/config/chain-id' 'https://fsn1.your-objectstorage.com/rollup-deployments/hibernia/chain-id'; then
+            echo 'ERROR: Failed to download chain-id file'
+            exit 1
+          fi
+          echo 'Chain-id file downloaded successfully'
+        else
+          echo 'Chain-id file already exists, skipping download'
+        fi
+
+        # Download rollup.json for op-node if it doesn't exist
+        echo 'Checking for rollup config'
+        mkdir -p /op-node/rollup
+        if [ ! -f '/op-node/rollup/rollup.json' ]; then
+          echo 'Downloading op-node rollup config'
+          if ! wget -O '/op-node/rollup/rollup.json' 'https://fsn1.your-objectstorage.com/rollup-deployments/hibernia/rollup.json'; then
+            echo 'ERROR: Failed to download rollup config'
+            exit 1
+          fi
+          echo 'Rollup config downloaded successfully'
+
+          # Set proper permissions only if we downloaded new files
+          chmod -R 777 /op-node
+          chmod -R 777 /config
+        else
+          echo 'Rollup config already exists, skipping download'
+        fi
+
+        # Generate JWT secret if it doesn't exist
+        if [ ! -f '/jwt/jwt' ]; then
+          echo 'Generating JWT secret'
+          mkdir -p /jwt
+          # Generate a 32-byte random hex string for JWT secret
+          apk add --no-cache openssl
+          openssl rand -hex 32 > /jwt/jwt
+          chmod 666 /jwt/jwt
+          echo 'JWT secret generated successfully'
+        else
+          echo 'JWT secret already exists, skipping generation'
+        fi
+    volumes:
+      - op_node_data:/op-node
+      - config_data:/config
+      - jwt_shared:/jwt
+
+  op-geth-init:
+    image: us-docker.pkg.dev/oplabs-tools-artifacts/images/op-geth:v1.101503.4
+    depends_on:
+      op-init:
+        condition: service_completed_successfully
+    entrypoint: []
+    command:
+      - /bin/sh
+      - -c
+      - |
+        set -e
+        if [ ! -f '/geth/geth' ]; then
+          echo 'Initializing geth data directory with genesis block...'
+
+          # Use genesis file from op-init
+          if ! geth init --state.scheme=hash --datadir='/geth' '/config/genesis.json'; then
+            echo 'ERROR: Failed to initialize geth with genesis block'
+            exit 1
+          fi
+          echo 'Geth initialized successfully with genesis block'
+        else
+          echo 'Geth data directory already initialized, skipping initialization'
+        fi
+    volumes:
+      - op_geth_data:/geth
+      - config_data:/config
+
+  op-geth:
+    image: us-docker.pkg.dev/oplabs-tools-artifacts/images/op-geth:v1.101503.4
+    restart: unless-stopped
+    stop_grace_period: 5m
+    network_mode: host
+    depends_on:
+      op-geth-init:
+        condition: service_completed_successfully
+    command:
+      - --networkid=522949
+      - --datadir=/geth
+      - --http
+      - --http.corsdomain=*
+      - --http.vhosts=*
+      - --http.addr=0.0.0.0
+      - --http.port=8545
+      - --http.api=debug,eth,txpool,net,engine,web3
+      - --ws
+      - --ws.addr=0.0.0.0
+      - --ws.port=8546
+      - --ws.origins=*
+      - --ws.api=debug,eth,txpool,net,engine,web3
+      - --syncmode=snap
+      - --authrpc.vhosts=*
+      - --authrpc.addr=0.0.0.0
+      - --authrpc.port=8551
+      - --authrpc.jwtsecret=/jwt/jwt
+      - --usb=false
+      - --state.scheme=hash
+      - --nat=none
+      - --bootnodes=enode://8090e9660de359bd18287a397e419108b9df5b08a4587444967a9d981f5332c109a8208e8e9af049347bf950c17b4405632e35e0f87c5cac0068352db181bba2@116.202.192.224:30097
+    ports:
+      - 8545:8545
+      - 8546:8546
+    volumes:
+      - op_geth_data:/geth
+      - jwt_shared:/jwt
+      - config_data:/config
+
+  op-node:
+    image: us-docker.pkg.dev/oplabs-tools-artifacts/images/op-node:v1.13.0
+    restart: unless-stopped
+    stop_grace_period: 5m
+    network_mode: host
+    depends_on:
+      op-init:
+        condition: service_completed_successfully
+      op-geth:
+        condition: service_started
+    command:
+      - op-node
+      - --l1=http://localhost:8535
+      - --l1.beacon=http://localhost:5052
+      - --l1.rpckind=standard
+      - --l1.trustrpc
+      - --l2=http://localhost:8551
+      - --l2.enginekind=geth
+      - --l2.jwt-secret=/jwt/jwt
+      - --rpc.addr=0.0.0.0
+      - --rpc.port=9545
+      - --p2p.nat=true
+      - --p2p.ban.peers=false
+      - --p2p.bootnodes=enr:-J64QK6djwDvjjQA51wkA13CxO9iX-k9EHhtk4O0cpNlNlY1IicMJDavSaznDbTzsFo0wS_6mtpMp1NoNgNQvVDti0iGAZahdVX6gmlkgnY0gmlwhHTKwOCHb3BzdGFja4TF9R8AiXNlY3AyNTZrMaECLfFVQIwdTfjwTbLJoU_Jm6gIf6T7RimzzcscQh74zoSDdGNwgnWSg3VkcIJ1kg
+      - --p2p.listen.tcp=9222
+      - --p2p.listen.udp=9222
+      - --metrics.enabled
+      - --metrics.addr=0.0.0.0
+      - --metrics.port=7300
+      - --syncmode=execution-layer
+      - --rollup.config=/op-node/rollup/rollup.json
+      - --log.level=info
+    ports:
+      - 9545:9545
+    volumes:
+      - jwt_shared:/jwt
+      - op_node_data:/op-node
