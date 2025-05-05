@@ -152,7 +152,6 @@ services:
       - --l2.jwt-secret=/jwt/jwt
       - --rpc.addr=0.0.0.0
       - --rpc.port=9545
-      - --rpc.enable-admin
       - --p2p.nat=true
       - --p2p.ban.peers=false
       - --p2p.bootnodes=enr:-J64QHycZJLh_12-9DNO7Te1chzJoFpYYFl6G-eUJqG4oYfjdsEdoLWcQ3fuRRfxfpKMp-4jCSEsBorpXoMsQTE9ur-GAZZkK5JHgmlkgnY0gmlwhHTKwOCHb3BzdGFja4S6ghgAiXNlY3AyNTZrMaECzjCwkAy3SkUVzxdBcwYB_tOyqGbjF8V80TToRFcOO-WDdGNwgnbWg3VkcIJ21g,enr:-J64QORj4u9uGLVJYmb_dHCl47m7gySW1-4t_rE9VfrpL2RPIRBAKWcLaBxA9bhFn8H942bsF5zDhNeS2umNBye0U5GGAZZkK5JBgmlkgnY0gmlwhHTKwOCHb3BzdGFja4S6ghgAiXNlY3AyNTZrMaECzjCwkAy3SkUVzxdBcwYB_tOyqGbjF8V80TToRFcOO-WDdGNwgnbWg3VkcIJ21g,enr:-J64QKzgeWhBjQwt-dDOkrxOTN3-SJdgxSODEOdghO8kmKhVI2ExzUtxTPu4S7zeJimHyQgqtF-Nj0CKBMCV3R1z_iSGAZZkw6WMgmlkgnY0gmlwhHTKwOCHb3BzdGFja4S6ghgAiXNlY3AyNTZrMaECPlyiCkdQpgyhrJEhZkNr7dRDpSAkUVWOgCOkiQxSxjaDdGNwgnbYg3VkcIJ22A
