@@ -139,9 +139,6 @@ services:
       - --state.scheme=hash
       - --nat=none
       - --bootnodes=enode://8090e9660de359bd18287a397e419108b9df5b08a4587444967a9d981f5332c109a8208e8e9af049347bf950c17b4405632e35e0f87c5cac0068352db181bba2@116.202.192.224:30097
-    ports:
-      - 8545:8545
-      - 8546:8546
     volumes:
       - op_geth_data:/geth
       - jwt_shared:/jwt
@@ -159,8 +156,8 @@ services:
         condition: service_started
     command:
       - op-node
-      - --l1=http://localhost:8535
-      - --l1.beacon=http://localhost:5052
+      - --l1=http://sepolia-geth-1.tail1610af.ts.net:8545
+      - --l1.beacon=http://sepolia-lighthouse-1.tail1610af.ts.net:5052
       - --l1.rpckind=standard
       - --l1.trustrpc
       - --l2=http://localhost:8551
@@ -178,9 +175,7 @@ services:
       - --metrics.port=7300
       - --syncmode=execution-layer
       - --rollup.config=/op-node/rollup/rollup.json
-      - --log.level=info
-    ports:
-      - 9545:9545
+      - --log.level=debug
     volumes:
       - jwt_shared:/jwt
       - op_node_data:/op-node
