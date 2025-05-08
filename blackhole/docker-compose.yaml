@@ -1,0 +1,170 @@
+volumes:
+  op_geth_data:
+  op_node_data:
+  jwt_shared:
+  config_data:
+
+services:
+
+  # ========================================
+  # OPTIMISM NODE SERVICES
+  # ========================================
+  op-init:
+    image: alpine:latest
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+
+        # Create config directory
+        mkdir -p /config
+
+        # Download genesis.json for op-geth if it doesn't exist
+        echo 'Checking for genesis file'
+        if [ ! -f '/config/genesis.json' ]; then
+          echo 'Downloading genesis file'
+          if ! wget -O '/config/genesis.json' 'https://fsn1.your-objectstorage.com/golem-base/blackhole/genesis.json'; then
+            echo 'ERROR: Failed to download genesis file'
+            exit 1
+          fi
+          echo 'Genesis file downloaded successfully'
+        else
+          echo 'Genesis file already exists, skipping download'
+        fi
+
+        # Download rollup.json for op-node if it doesn't exist
+        echo 'Checking for rollup config'
+        mkdir -p /op-node/rollup
+        if [ ! -f '/op-node/rollup/rollup.json' ]; then
+          echo 'Downloading op-node rollup config'
+          if ! wget -O '/op-node/rollup/rollup.json' 'https://fsn1.your-objectstorage.com/golem-base/blackhole/rollup.json'; then
+            echo 'ERROR: Failed to download rollup config'
+            exit 1
+          fi
+          echo 'Rollup config downloaded successfully'
+
+          # Set proper permissions only if we downloaded new files
+          chmod -R 777 /op-node
+          chmod -R 777 /config
+        else
+          echo 'Rollup config already exists, skipping download'
+        fi
+
+        # Generate JWT secret if it doesn't exist
+        if [ ! -f '/jwt/jwt' ]; then
+          echo 'Generating JWT secret'
+          mkdir -p /jwt
+          # Generate a 32-byte random hex string for JWT secret
+          apk add --no-cache openssl
+          openssl rand -hex 32 > /jwt/jwt
+          chmod 666 /jwt/jwt
+          echo 'JWT secret generated successfully'
+        else
+          echo 'JWT secret already exists, skipping generation'
+        fi
+    volumes:
+      - op_node_data:/op-node
+      - config_data:/config
+      - jwt_shared:/jwt
+
+  op-geth-init:
+    image: quay.io/golemnetwork/gb-op-geth:v1.101503.1-laika
+    depends_on:
+      op-init:
+        condition: service_completed_successfully
+    entrypoint: []
+    command:
+      - /bin/sh
+      - -c
+      - |
+        set -e
+        if [ ! -f '/geth/geth' ]; then
+          echo 'Initializing geth data directory with genesis block...'
+
+          # Use genesis file from op-init
+          if ! geth init --state.scheme=hash --datadir='/geth' '/config/genesis.json'; then
+            echo 'ERROR: Failed to initialize geth with genesis block'
+            exit 1
+          fi
+          echo 'Geth initialized successfully with genesis block'
+        else
+          echo 'Geth data directory already initialized, skipping initialization'
+        fi
+    volumes:
+      - op_geth_data:/geth
+      - config_data:/config
+
+  op-geth:
+    image: quay.io/golemnetwork/gb-op-geth:v1.101503.1-laika
+    restart: unless-stopped
+    stop_grace_period: 5m
+    network_mode: host
+    depends_on:
+      op-geth-init:
+        condition: service_completed_successfully
+    command:
+      - --networkid=500000
+      - --datadir=/geth
+      - --http
+      - --http.corsdomain=*
+      - --http.vhosts=*
+      - --http.addr=0.0.0.0
+      - --http.port=8545
+      - --http.api=debug,eth,txpool,net,engine,web3,admin
+      - --ws
+      - --ws.addr=0.0.0.0
+      - --ws.port=8546
+      - --ws.origins=*
+      - --ws.api=debug,eth,txpool,net,engine,web3,admin
+      - --syncmode=snap
+      - --authrpc.vhosts=*
+      - --authrpc.addr=0.0.0.0
+      - --authrpc.port=8551
+      - --authrpc.jwtsecret=/jwt/jwt
+      - --usb=false
+      - --state.scheme=hash
+      - --nat=none
+      - --bootnodes=enode://64b3aac3fea2177618cecbb88c1a9c63be93e6d26a938f9f1cbdffe0711d823f3cf29031aae0767215ad3e1e2dc982898a8477b1c4891a6138d3e6aae80d9385@116.202.192.224:33103,enode://1d71716e32e8fd38fb4f7e98640326fda80b5c70fa29a7ccdf489412c926c34d738dbae3543e322ba2484a1a279b87d0c9ee24847a2b95e91251605fed927776@116.202.193.109:33203,enode://65b721bcc686659c7f77b9000a47c4106c3a1994cf2d742ed42c63f3b2e04bbb2beec4de757f9bb60fd3e25b59210c84a40bc5b657debd5f83f99ca30cd5032e@37.27.230.18:33303
+    volumes:
+      - op_geth_data:/geth
+      - jwt_shared:/jwt
+
+  op-node:
+    image: us-docker.pkg.dev/oplabs-tools-artifacts/images/op-node:v1.13.0
+    restart: unless-stopped
+    stop_grace_period: 5m
+    network_mode: host
+    depends_on:
+      op-init:
+        condition: service_completed_successfully
+      op-geth:
+        condition: service_started
+    command:
+      - op-node
+      - --l1=https://execution.holesky.l2.gobas.me
+      - --l1.beacon.ignore=true
+      - --l1.rpckind=standard
+      - --l1.trustrpc
+      - --l1.epoch-poll-interval=2s
+      - --l1.http-poll-interval=2s
+      - --l2=http://localhost:8551
+      - --l2.enginekind=geth
+      - --l2.jwt-secret=/jwt/jwt
+      - --rpc.addr=0.0.0.0
+      - --rpc.port=9545
+      - --rpc.enable-admin
+      - --p2p.nat=true
+      - --p2p.ban.peers=false
+      - --p2p.bootnodes=enr:-J64QKn3UCiFkW8XcwvZXul2fwe_xKR3dkku7Wk-u7iykxtEO0_0LK9NEGIeBVUyHB92BiUxZ6PDOam1-kW7t-Rz78uGAZavP59ugmlkgnY0gmlwhHTKwOCHb3BzdGFja4Sgwh4AiXNlY3AyNTZrMaEDL4KEWmS_GNz2t1VAPkxhBrvayb517qXNIVdqWHwn8aeDdGNwgoFjg3VkcIKBYw,enr:-J64QIS0K6iwrCJ2iiD8CWkf3e_JeyWJg0sO79RKxHmVY84GenTeYP6Jc8xLP6gGmNEPNkMY5v9E8HVBV6MEXSfYZAqGAZavP9nEgmlkgnY0gmlwhHTKwW2Hb3BzdGFja4Sgwh4AiXNlY3AyNTZrMaED_HKE7cijMpKjGihTNiEG1cKH059GOEbROi63WkuCgTqDdGNwgoHHg3VkcIKBxw,enr:-J64QC1FyvXl6QkfApVWgpJcUv3uOfOVPVNFAsC51DtWBfu1agztFXma1HltILrpkuWFAWpUBzNo-C6JOhlbC1icU4mGAZavQBWOgmlkgnY0gmlwhCUb5hKHb3BzdGFja4Sgwh4AiXNlY3AyNTZrMaEDKwj2HphyjhFrUFbGZ87tBzE_g9-B0Rm2GqE8bQDuK3mDdGNwgoIrg3VkcIKCKw
+      - --p2p.listen.tcp=9222
+      - --p2p.listen.udp=9222
+      - --metrics.enabled
+      - --metrics.addr=0.0.0.0
+      - --metrics.port=7300
+      - --syncmode=execution-layer
+      - --rollup.config=/op-node/rollup/rollup.json
+      - --log.level=debug
+    volumes:
+      - jwt_shared:/jwt
+      - op_node_data:/op-node
