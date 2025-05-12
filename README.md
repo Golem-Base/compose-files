@@ -17,7 +17,7 @@ These docker-compose files enable you to run Golem Base nodes locally in Docker 
 To run your Golem node:
 
 1. Clone this repository
-2. Change to the compose-file directory:
+2. Change to the compose-file directory of the network of choice (`l2` or `l3`):
    ```bash
    cd l2-holesky
    ```
@@ -34,4 +34,3 @@ Each docker-compose file is configured with appropriate boot nodes and network s
 
 - Ensure you have enough system resources available for running the node
 - Check your Docker daemon is running before starting the containers
-
