@@ -143,8 +143,8 @@ services:
         condition: service_started
     command:
       - op-node
-      - --l1=https://execution.holesky.l1.gobas.me
-      - --l1.beacon=https://consensus.holesky.l1.gobas.me
+      - --l1=https://execution.holesky.golem-base.io
+      - --l1.beacon=https://consensus.holesky.golem-base.io
       - --l1.rpckind=standard
       - --l1.trustrpc
       - --l2=http://op-geth:8551
