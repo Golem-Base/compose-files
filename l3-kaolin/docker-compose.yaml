@@ -68,7 +68,7 @@ services:
       - jwt_shared:/jwt
 
   op-geth-init:
-    image: quay.io/golemnetwork/gb-op-geth:v1.101503.1-laika
+    image: quay.io/golemnetwork/gb-op-geth:v1.101503.1-kaolin
     depends_on:
       op-init:
         condition: service_completed_successfully
@@ -95,7 +95,7 @@ services:
       - config_data:/config
 
   op-geth:
-    image: quay.io/golemnetwork/gb-op-geth:v1.101503.1-laika
+    image: quay.io/golemnetwork/gb-op-geth:v1.101503.1-kaolin
     restart: unless-stopped
     stop_grace_period: 5m
     depends_on:
