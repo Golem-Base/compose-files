@@ -102,7 +102,7 @@ services:
       op-geth-init:
         condition: service_completed_successfully
     command:
-      - --networkid=600106
+      - --networkid=600606
       - --datadir=/geth
       - --http
       - --http.corsdomain=*
