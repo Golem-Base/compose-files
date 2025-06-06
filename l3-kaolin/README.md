@@ -52,4 +52,4 @@ This node connects to Holesky L2 endpoint at:
 
 ## Bridge
 
-To transfer funds from Holesky L2 to our L3, send funds to the bridge address `0x51cd8658afb376977ed63d93d774488412a2eb20`
+To transfer funds from Holesky L2 to our L3, send funds to the bridge address `0xaa6Aa7472bf18FE4C617a3f0A9bE363197ec7365`
