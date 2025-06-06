@@ -117,7 +117,7 @@ services:
       - --ws.port=8546
       - --ws.origins=*
       - --ws.api=debug,eth,txpool,net,engine,web3,golembase,txpool
-      - --syncmode=snap
+      - --syncmode=full
       - --authrpc.vhosts=*
       - --authrpc.addr=0.0.0.0
       - --authrpc.port=8551
@@ -146,6 +146,7 @@ services:
       - --altda.enabled=true
       - --altda.da-server=https://altai.altda.l3.holesky.golem-base.io
       - --altda.da-service=false
+      - --p2p.disable=true
       - --p2p.bootnodes=
       - --p2p.no-discovery=true
       - --l1=https://rpc.l2.holesky.golem-base.io
@@ -160,7 +161,7 @@ services:
       - --metrics.enabled
       - --metrics.addr=0.0.0.0
       - --metrics.port=7300
-      - --syncmode=execution-layer
+      - --syncmode=consensus-layer
       - --rollup.config=/op-node/rollup/rollup.json
       - --log.level=info
     ports:
