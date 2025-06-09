@@ -103,7 +103,7 @@ services:
       op-geth-init:
         condition: service_completed_successfully
     command:
-      - --networkid=500003
+      - --networkid=500005
       - --datadir=/geth
       - --nodiscover=true
       - --http
