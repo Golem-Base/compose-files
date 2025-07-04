@@ -35,7 +35,7 @@ services:
       - jwt_shared:/jwt
 
   op-geth-init:
-    image: golemnetwork/golembase-l3-op-geth:v1.101511.0-0.1-kaolin-0c3aa967
+    image: golemnetwork/golembase-l3-op-geth:v1.101511.0-0.2-kaolin-efb3171d
     depends_on:
       op-init:
         condition: service_completed_successfully
@@ -61,7 +61,7 @@ services:
       - op_geth_data:/geth
 
   op-geth:
-    image: golemnetwork/golembase-l3-op-geth:v1.101511.0-0.1-kaolin-0c3aa967
+    image: golemnetwork/golembase-l3-op-geth:v1.101511.0-0.2-kaolin-efb3171d
     restart: unless-stopped
     stop_grace_period: 5m
     depends_on:
@@ -99,7 +99,7 @@ services:
       - jwt_shared:/jwt
 
   op-node:
-    image: golemnetwork/golembase-l3-op-node:v1.13.0-kaolin-d03a3526
+    image: golemnetwork/golembase-l3-op-node:v1.13.0-kaolin-1795ff3d
     restart: unless-stopped
     stop_grace_period: 5m
     depends_on:
