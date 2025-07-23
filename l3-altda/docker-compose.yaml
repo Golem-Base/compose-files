@@ -103,7 +103,7 @@ services:
       op-geth-init:
         condition: service_completed_successfully
     command:
-      - --networkid=500005
+      - --networkid=500018
       - --datadir=/geth
       - --nodiscover=true
       - --http
@@ -133,7 +133,7 @@ services:
       - jwt_shared:/jwt
 
   op-node:
-    image: us-docker.pkg.dev/oplabs-tools-artifacts/images/op-node:v1.13.0
+    image: golemnetwork/op-node:v1.13.0-altda-debug
     restart: unless-stopped
     stop_grace_period: 5m
     depends_on:
