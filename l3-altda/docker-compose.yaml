@@ -3,6 +3,7 @@ volumes:
   op_node_data:
   jwt_shared:
   config_data:
+  kubo_data:
 
 services:
 
@@ -144,7 +145,7 @@ services:
     command:
       - op-node
       - --altda.enabled=true
-      - --altda.da-server=https://altai.altda.l3.holesky.golem-base.io
+      - --altda.da-server=http://localhost:5001
       - --altda.da-service=false
       - --p2p.disable=true
       - --p2p.bootnodes=
@@ -169,3 +170,14 @@ services:
     volumes:
       - jwt_shared:/jwt
       - op_node_data:/op-node
+
+  kubo:
+    image: ipfs/kubo:latest
+    restart: unless-stopped
+    ports:
+      - 4001:4001
+      - 4001:4001/udp
+      - 5001:5001
+      - 8080:8080
+    volumes:
+      - kubo_data:/data/ipfs
