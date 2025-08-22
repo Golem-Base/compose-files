@@ -149,7 +149,7 @@ services:
       - --p2p.disable=true
       - --p2p.bootnodes=
       - --p2p.no-discovery=true
-      - --l1=https://rpc.l2.holesky.golem-base.io
+      - --l1=https://l2.holesky.golem-base.io/rpc
       - --l1.beacon.ignore=true
       - --l1.rpckind=standard
       - --l1.trustrpc
