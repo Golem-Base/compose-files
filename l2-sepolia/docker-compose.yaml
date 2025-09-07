@@ -1,0 +1,93 @@
+networks:
+  rollup:
+    driver: bridge
+
+volumes:
+  execution_volume:
+  init_volume:
+
+services:
+  init:
+    image: quay.io/golemnetwork/rollup-deployments:golem-base-init--hibernia--20250507132040
+    volumes:
+      - execution_volume:/execution
+      - init_volume:/init
+
+  op-geth:
+    image: us-docker.pkg.dev/oplabs-tools-artifacts/images/op-geth:v1.101503.4
+    restart: unless-stopped
+    stop_grace_period: 5m
+    networks:
+      - rollup
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    entrypoint: ["/bin/sh", "-c"]
+    command: 
+      - |
+        exec geth \
+          --networkid=$(cat /init/chain-id) \
+          --datadir=/execution \
+          --http \
+          --http.corsdomain=* \
+          --http.vhosts=* \
+          --http.addr=0.0.0.0 \
+          --http.port=8545 \
+          --http.api=web3,debug,eth,txpool,net,admin \
+          --ws \
+          --ws.addr=0.0.0.0 \
+          --ws.port=8546 \
+          --ws.origins=* \
+          --ws.api=debug,eth,txpool,net,web3,admin \
+          --syncmode=snap \
+          --authrpc.vhosts=* \
+          --authrpc.addr=0.0.0.0 \
+          --authrpc.port=8551 \
+          --authrpc.jwtsecret=/init/jwt \
+          --bootnodes=enode://41dfd8a479846e51e02d993d8a57c16e5cc104e4182190936a9bf06fe12aa8ebfb6a4950c7723686c985e73a4f76f7c4828c3a49ef63857bae3ab847bb4a1d03@116.202.192.224:30101,enode://b0562d373f5a49384cc42a27e116d8991f3179eec24301e5150174e68dfcdcf5d6ab0e222aace82f0b968908af29fc7d5ecc4b07a9df04bbbdb655a0352608ca@116.202.192.224:30099,enode://8090e9660de359bd18287a397e419108b9df5b08a4587444967a9d981f5332c109a8208e8e9af049347bf950c17b4405632e35e0f87c5cac0068352db181bba2@116.202.192.224:30097 \
+          --verbosity=3
+    volumes:
+      - execution_volume:/execution
+      - init_volume:/init
+    ports:
+      - "8545:8545"
+      - "8546:8546"
+      - "8551:8551"
+
+  op-node:
+    image: us-docker.pkg.dev/oplabs-tools-artifacts/images/op-node:v1.13.0
+    restart: unless-stopped
+    stop_grace_period: 5m
+    networks:
+      - rollup
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    entrypoint: ["/bin/sh", "-c"]
+    command: 
+      - |
+        exec op-node \
+          --sequencer.enabled=false \
+          --sequencer.stopped=false \
+          --sequencer.l1-confs=4 \
+          --verifier.l1-confs=4 \
+          --l1=http://sepolia-geth-1.tail1610af.ts.net:8545 \
+          --l1.beacon=http://sepolia-lighthouse-1.tail1610af.ts.net:5052 \
+          --l1.trustrpc \
+          --l1.rpckind=standard \
+          --l2=http://op-geth:8551 \
+          --syncmode=execution-layer \
+          --l2.enginekind=geth \
+          --l2.jwt-secret=/init/jwt \
+          --rollup.config=/init/rollup.json \
+          --rpc.addr=0.0.0.0 \
+          --rpc.port=9545 \
+          --rpc.enable-admin=true \
+          --p2p.bootnodes=enr:-J64QOIIBaQrb81-N7t5wapE6K4dXWNIK-a4fzooiXKURDXlV6ebEv-iA8NqPKimiaoprQg1I6dC75y0FoFoBSj6l2GGAZaiY3vxgmlkgnY0gmlwhHTKwOCHb3BzdGFja4TF9R8AiXNlY3AyNTZrMaEDm7UeNwSJyZZ4Le62KqclKBovkKBS7H12tEh633jD_kWDdGNwgnWWg3VkcIJ1lg,enr:-J64QNKufj3O4FqZcY-AbIlsJthA3Z9iY_hFTlYe2cij820dG15sOi5pTs61iXnDXhvvO9YbMgXSkOnVBMON5UPJdViGAZalxDeSgmlkgnY0gmlwhHTKwOCHb3BzdGFja4TF9R8AiXNlY3AyNTZrMaEClnkqAC_-pX-023eDY9gRh5D6As0XOZ6B7sr_1j4nFj6DdGNwgnWUg3VkcIJ1lA,enr:-J64QHiZuSxT0Z0B2viGO35Qz2L60Qd89_tKloj8_hDG3zVRAo5FGQ6Yn9DJvYWnoj-wpkXfnMZF4QmEGo3Yml-iqGSGAZahdVYBgmlkgnY0gmlwhHTKwOCHb3BzdGFja4TF9R8AiXNlY3AyNTZrMaECLfFVQIwdTfjwTbLJoU_Jm6gIf6T7RimzzcscQh74zoSDdGNwgnWSg3VkcIJ1kg \
+          --p2p.discovery.path="memory" \
+          --p2p.peerstore.path="memory" \
+          --log.level=info
+    volumes:
+      - init_volume:/init
+    ports:
+      - "9545:9545"
