@@ -30,7 +30,7 @@ services:
     - op_node_data:/op-node
     - jwt_shared:/jwt
   op-geth-init:
-    image: golemnetwork/golembase-l3-op-geth:v1.101511.0-0.2-hoodi-test-l9-326e877e
+    image: golemnetwork/golembase-l3-op-geth:v1.101511.0-0.2-hoodi-test-l9-366c97a9
     depends_on:
       op-init:
         condition: service_completed_successfully
@@ -55,14 +55,14 @@ services:
     volumes:
     - op_geth_data:/geth
   op-geth:
-    image: golemnetwork/golembase-l3-op-geth:v1.101511.0-0.2-hoodi-test-l9-326e877e
+    image: golemnetwork/golembase-l3-op-geth:v1.101511.0-0.2-hoodi-test-l9-366c97a9
     restart: unless-stopped
     stop_grace_period: 5m
     depends_on:
       op-geth-init:
         condition: service_completed_successfully
     command:
-    - --networkid=3
+    - --networkid=20051
     - --datadir=/geth
     - --http
     - --http.corsdomain=*
@@ -83,7 +83,7 @@ services:
     - --usb=false
     - --state.scheme=hash
     - --nat=none
-    - --bootnodes=enode://9840a02807eb2f265a16322b125b758845db9b25b7dd9a0c0a1941c15515f63482da2747ef594eb7f4bebabb82101f4cbb25f3cb4525658beecf7f673f939fba@195.201.165.105:32524,enode://fe6034d196e9d843061338054e2a0f2d0765d007803a178e59e8be30fd622c466a3cd36b07ca803010fb5df952bee3589d2e665363f8e75d4a2c4f4bb6584dc8@195.201.165.105:32526,enode://d8ccde9d97dffd9399b1e8012c2e87ba86832b7986e1d4edb40466a33e2a11d1f61d8e718059fe6fa4d6263323be6834cfcad6663fc9a63de4b725263d97c2da@195.201.165.105:32528,enode://1c10185a070f9ccc2fe1506cf0e82adde8456b49b23a05ab66bc65e1033075472977cb95a0973f790e071c98d37c184943c3bc75f962a1c0e37c719aee967c5a@195.201.165.105:32530,enode://214811356cd97474ba6622fb725d9845d4530f17ec8c63d0733eaa53b3b6d73b577313e9770b503ce4bf3d3060045c528511114dece907202bb3360b88a37352@195.201.165.105:32532
+    - --bootnodes=enode://0240d7fe8ebe907927686ee7e7f2a2b899f5ca3eed291641483c6afc0c2e85383e2d411c05714437f6093bce96b1d1182d31d74b943cb18ed209496f1318dbe3@195.201.165.105:30012,enode://0789caab5d7bbecb540002a2c3bb65664e2a01a54ce52a08d428de53cf87ce0632c48f09c05bd71c2a397a963fdf22368ddc0f3bdee9981df7751e97a04618c0@195.201.165.105:30014,enode://d60f127645d842f6ba861cb3c98a3de715b3b527c5d1e13bb7213912e53aaa769958a5452a85f33b0a5a9b6f5a83bb0e3efd76652c3da753be8f7b4096728ac4@195.201.165.105:30016,enode://69ff4cda79959c65157e3980673468e107efa452a06fef845d77072ce32488847b5a7024ed2f2e9d892a2c791e6f1d728f34a408a0fe0ae39ab07fd32719006d@195.201.165.105:30018,enode://704b19ed831f091b52ea4a546b0a9bfe9a997e942bc6862f4138b9955530c72a4d0879a78abe296a9555dd926028a6793071ef613a756c999aa32057e73ac1d0@195.201.165.105:30020
     - --txpool.disable.non.golembase.transactions=true
     ports:
     - 8545:8545
@@ -92,7 +92,7 @@ services:
     - op_geth_data:/geth
     - jwt_shared:/jwt
   op-node:
-    image: golemnetwork/golembase-l3-op-node:v1.13.4-hoodi-test-l9-1f35217d
+    image: golemnetwork/golembase-l3-op-node:v1.13.4-hoodi-test-l9-ed186e87
     restart: unless-stopped
     stop_grace_period: 5m
     depends_on:
@@ -113,7 +113,7 @@ services:
     - --rpc.port=9545
     - --p2p.nat=true
     - --p2p.ban.peers=false
-    - --p2p.bootnodes=enr:-Jy4QIF1dolzu4Ico-_2WEFqvEltBWBFrqt6gPtq_DkfTiSYSW0QZznI_lmI7IbnjfooJQjPdcZfxCGxilFb6PaqtDeGAZmfZfWSgmlkgnY0gmlwhMPJpWmHb3BzdGFja4IDAIlzZWNwMjU2azGhAycdJWhy0X1C0xop-fp0ZwEoEWNX4cWPsOmrALUEgIz6g3RjcIJ_DYN1ZHCCfw0,enr:-Jy4QD0xQuc5ZfD4wfgGacrx5n9Sa_SI2HmvV5KB1PKcSRGmPA__dbp2J1eqaRMqkthjIx08ZS5luno2vGJqUF3bXDiGAZmfZfWOgmlkgnY0gmlwhMPJpWmHb3BzdGFja4IDAIlzZWNwMjU2azGhAhje_o--QvWYVGESEXTM1j4LMofwuhw267HwtSz_5bqlg3RjcIJ_D4N1ZHCCfw8,enr:-Jy4QBJcMYLKf5opNWdU3DoKJmt7Ip9dYkXdztIDBb7zE2bHKf8Bp07soll9Ac5gub1nsRNXzzLPJ4z1iyPK7aK3_52GAZmfZfVkgmlkgnY0gmlwhMPJpWmHb3BzdGFja4IDAIlzZWNwMjU2azGhAwk6aLmpBED-ig2iA31tqeXArZ9Ijn3-tazE__g8LycAg3RjcIJ_EYN1ZHCCfxE,enr:-Jy4QARlYIs9xdwMNFCtp9Cszguoqb0-u62WXQ9_MaE9zakhUZuBcdCXsxdVhTitRRwuJZiu7ey4iRkM7XkWwR8ktbyGAZmfZfWJgmlkgnY0gmlwhMPJpWmHb3BzdGFja4IDAIlzZWNwMjU2azGhAiQaMGh2o7YNjm8ErufHCnxUCAaI_GIGfSFSrC18Z6UPg3RjcIJ_E4N1ZHCCfxM,enr:-Jy4QGNU58BUpmwv4as0nY50TsKmaw6KA5fhCUZU6RNkHplcQbl6dQZg2IXeeQ5B60IiWy9egpZtAK-lb7QGN3pJ-eWGAZmfZfWJgmlkgnY0gmlwhMPJpWmHb3BzdGFja4IDAIlzZWNwMjU2azGhA4e-EzWaWrGbo9e-fRPa45b92KqGJqUsxtQshp7_VvUzg3RjcIJ_FYN1ZHCCfxU
+    - --p2p.bootnodes=enr:-J64QLAHO1JFGy1VXFfME_o3l-qlILOgr_W4DakjfP7t3Os3FnKWelSSdxDwnM6jhLlvX7IKvDSO7Trf4bSeL7UxZiOGAZnoMiyBgmlkgnY0gmlwhMPJpWmHb3BzdGFja4TTnAEAiXNlY3AyNTZrMaED3FpfSJtrAsxYLwshA6n2YbhYviLaau9j-it1RIs3uMODdGNwgnU9g3VkcIJ1PQ,enr:-J64QE4OzSLFsLSpJndXPz3zP6sgtVmk041R1Lp0jhf-OLALGBM74NfPXnL2a2Oko8VqBWf7kNoxxssOW_0PyShiS3CGAZnoMiuRgmlkgnY0gmlwhMPJpWmHb3BzdGFja4TTnAEAiXNlY3AyNTZrMaED0BcWTU-EatLg5ztxYM_FUBgjSe4vXsX6FAciFLw5IimDdGNwgnU_g3VkcIJ1Pw,enr:-J64QLKrc2R20Bk-YNOnzyN5LYV8IIjgcsoFYVkLuJBSBiGdY9z4L25NzbyftTVCFLmxGArrmj6uO9EkgL784oiQShWGAZnoMiuSgmlkgnY0gmlwhMPJpWmHb3BzdGFja4TTnAEAiXNlY3AyNTZrMaEDFWW17pZjEnym1rtz3cXvOlY1Pa8rHzBf72oX4oGwwEiDdGNwgnVBg3VkcIJ1QQ,enr:-J64QAt4nPruhcwRF4LgJfoBrYMI3ZOdeW5djZ_Xn2FFSO4jACZKMxloCs1H-tN9RyintoLRXIXBgEBM2HPK_IqJ2IGGAZnoMixNgmlkgnY0gmlwhMPJpWmHb3BzdGFja4TTnAEAiXNlY3AyNTZrMaECzpVzLqr3XfCHR9ydtnZpyfRMEFZL92hcDM1B-7rG6u6DdGNwgnVDg3VkcIJ1Qw,enr:-J64QPQMnL13AiTFsxSxPbqGr3ChDrK7xqsmkgiBY2kFBthKfNpvWIjK12VUp-W_vD7ynvUcaMmaU-FTop9JxMeIeq6GAZnoMiuEgmlkgnY0gmlwhMPJpWmHb3BzdGFja4TTnAEAiXNlY3AyNTZrMaEDNudHpJ29DWoLfaPxVJ1tHwLI4KcQMl8BA0FlX0URUxWDdGNwgnVFg3VkcIJ1RQ
     - --p2p.listen.tcp=9222
     - --p2p.listen.udp=9222
     - --metrics.enabled
