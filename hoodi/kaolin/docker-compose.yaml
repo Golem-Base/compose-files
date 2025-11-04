@@ -124,6 +124,7 @@ services:
             - --metrics.port=7300
             - --syncmode=execution-layer
             - --rollup.config=/rollup.json
+            - --rollup.l1-chain-config=/genesis.json
             - --log.level=info
         ports:
             - 9545:9545
