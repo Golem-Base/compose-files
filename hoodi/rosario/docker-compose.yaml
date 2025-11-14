@@ -138,7 +138,7 @@ services:
             - jwt_shared:/jwt
             - op_node_data:/op-node
     altai:
-        image: golemnetwork/altai:latest
+        image: golemnetwork/altai:v2
         restart: unless-stopped
         ports:
             - 3100:3100
