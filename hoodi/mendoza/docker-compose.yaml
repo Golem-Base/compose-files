@@ -147,6 +147,5 @@ services:
             - --port=3100
             - --backends=http
             - --http.endpoint=https://altda-prod.gobas.me
-            - --base-network=hoodi
             - --network=hoodi-mendoza
             - --log.level=debug
