@@ -146,7 +146,7 @@ services:
             - --addr=0.0.0.0
             - --port=3100
             - --backends=http
-            - --http.endpoint=https://altda-prod.gobas.me
+            - --http.endpoint=https://darkiv.network
             - --base-network=hoodi
             - --network=test-asy-lm0
             - --log.level=info
